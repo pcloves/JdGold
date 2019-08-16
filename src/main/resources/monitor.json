@@ -1,0 +1,47 @@
+[
+  {
+    "name": "MonitorLimit",
+    "upThreshold": true,
+    "priceThreshold": 348.5
+  },
+  {
+    "name": "MonitorLimit",
+    "upThreshold": false,
+    "priceThreshold": 344.5
+  },
+  {
+    "name": "MonitorHistory",
+    "upThreshold": true,
+    "monitorIntervalMinutes": 60
+  },
+  {
+    "name": "MonitorHistory",
+    "upThreshold": false,
+    "monitorIntervalMinutes": 60
+  },
+  {
+    "name": "MonitorShake",
+    "priceShakeThreshold": 0.65,
+    "monitorIntervalSecond": 60
+  },
+  {
+    "name": "MonitorShake",
+    "priceShakeThreshold": 1.1,
+    "monitorIntervalSecond": 120
+  },
+  {
+    "name": "MonitorShake",
+    "priceShakeThreshold": 1.5,
+    "monitorIntervalSecond": 180
+  },
+  {
+    "name": "MonitorShake",
+    "priceShakeThreshold": 2.0,
+    "monitorIntervalSecond": 240
+  },
+  {
+    "name": "MonitorShake",
+    "priceShakeThreshold": 1.7,
+    "monitorIntervalSecond": 1200
+  }
+]
