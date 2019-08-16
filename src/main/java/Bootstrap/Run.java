@@ -83,7 +83,7 @@ public class Run implements Runnable
             if (needNotify > 0) {
                 final String title = builderTitle.toString();
                 final String content = builderContent.toString();
-                if (notification.notifiy(title, content))
+                if (notification.notify(title, content))
                 {
                     System.out.println("条件满足，开始预警：");
                     System.out.println("    标题：" + title);

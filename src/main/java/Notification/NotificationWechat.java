@@ -14,29 +14,35 @@ public class NotificationWechat implements INotification
      */
     private static final int notifyInterval = 173 * 1000;
     private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    private final HttpPost request = new HttpPost();
     private long lastNotifyTime = 0;
 
+
     @Override
-    public boolean notifiy(String title, String content)
+    public boolean notify(String title, String content)
     {
+        final long currentTimeMillis = System.currentTimeMillis();
+        if (currentTimeMillis - lastNotifyTime < notifyInterval) {
+            return false;
+        }
+
         try
         {
-            final long currentTimeMillis = System.currentTimeMillis();
-            if (currentTimeMillis - lastNotifyTime < notifyInterval) {
-                return false;
-            }
-
             final URIBuilder builder = new URIBuilder(String.format(HttpUrlFormat, System.getProperty(Config.SecretKey)));
             builder.addParameter("text", title);
             builder.addParameter("desp", content);
 
-            httpClient.execute(new HttpPost(builder.build()));
+            request.setURI(builder.build());
+            httpClient.execute(request);
 
             this.lastNotifyTime = currentTimeMillis;
 
             return true;
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        finally {
+            request.releaseConnection();
         }
 
         return false;
