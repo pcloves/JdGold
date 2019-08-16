@@ -34,10 +34,16 @@ public class Run implements Runnable
         this.monitorMap = monitorMap;
     }
 
-    private Run() throws IOException {
+    private Run() {
         final Path path = Paths.get(Config.MonitorConfig);
-        if (!Files.exists(path)) {
-            Files.createFile(path);
+        if (!Files.exists(path))
+        {
+            try {
+                Files.createFile(path);
+            } catch (IOException e) {
+                System.out.println("创建监控配置文件：" + Config.MonitorConfig + "失败，请使用管理员权限运行！");
+                System.exit(-1);
+            }
         }
 
         fileWatcher.setFile(path.toFile());
@@ -66,6 +72,8 @@ public class Run implements Runnable
 
             StringBuilder builderTitle = new StringBuilder(128);
             StringBuilder builderContent = new StringBuilder(128);
+            builderContent.append(date).append(":");
+
             int needNotify = 0;
             while (iterator.hasNext())
             {
@@ -91,14 +99,15 @@ public class Run implements Runnable
                 }
             }
 
-            System.out.println("================================================");
+            System.out.println("=====================================================================");
         }
         catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args)
+    {
 
         final String secretKey = System.getProperty(Config.SecretKey, "");
         if (secretKey.equals("")) {

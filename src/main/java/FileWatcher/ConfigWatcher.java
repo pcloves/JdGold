@@ -73,6 +73,8 @@ public class ConfigWatcher extends FileWatcher
 
             run.setMonitorMap(monitorMap);
 
+            System.out.println("配置文件加载完毕，监控规则数量：" + monitorMap.size());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
