@@ -13,6 +13,10 @@ public class Context
         NewestPrice(Float.class),
         NewestTime(Long.class),
         PriceToday(JSONArray.class),
+
+        NotifyTitle(String.class),
+        NotifyContent(String.class),
+
         ;
 
         private Class clazz;

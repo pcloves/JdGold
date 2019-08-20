@@ -88,10 +88,15 @@ public class Run implements Runnable
                 }
             }
 
-            if (needNotify > 0) {
+            if (needNotify > 0)
+            {
                 final String title = builderTitle.toString();
                 final String content = builderContent.toString();
-                if (notification.notify(title, content))
+
+                context.add(Context.ContextType.NotifyTitle, title);
+                context.add(Context.ContextType.NotifyContent, content);
+
+                if (notification.notify(context))
                 {
                     System.out.println("条件满足，开始预警：");
                     System.out.println("    标题：" + title);
@@ -119,6 +124,6 @@ public class Run implements Runnable
 
         final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         final Run run = new Run();
-        executorService.scheduleAtFixedRate(run, 0, 15, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(run, 0, 5, TimeUnit.SECONDS);
     }
 }
