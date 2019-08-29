@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -49,35 +49,42 @@ public class Run implements Runnable
         fileWatcher.setFile(path.toFile());
         fileWatcher.start();
         fileWatcher.doOnChange();
+
+        //初始化获取当天的价格
+        final JSONArray priceToday = Util.getTodayPrice();
+        context.add(Context.ContextType.PriceArray, priceToday);
     }
 
     public void run()
     {
-        try {
+        try
+        {
+            updatePrice();
 
-            final JSONArray priceToday = Util.getTodayPrice();
-            final JSONObject newestData = Util.getNewestData();
-            final float newestPrice = newestData.getFloat("price");
-            final long newestTime = newestData.getLong("time");
+            final JSONArray priceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
 
-            context.add(Context.ContextType.PriceToday, priceToday);
-            context.add(Context.ContextType.NewestTime, newestTime);
-            final Float priceLast = context.add(Context.ContextType.NewestPrice, newestPrice);
+            final JSONObject jsonPrice1 = priceArray.getJSONObject(0);
+            final Float price1 = Util.getPrice(jsonPrice1);
+            final long time1 = Util.getTime(jsonPrice1);
 
-            final String date = Config.DateFormat.format(new Date(newestTime));
-            final float priceChange = newestPrice - (priceLast == null ? 0 : priceLast);
+            final JSONObject jsonPrice2 = priceArray.getJSONObject(1);
+            final Float price2 = Util.getPrice(jsonPrice2);
+            final long time2 = Util.getTime(jsonPrice2);
 
-            System.out.println("最新金价时间：" + date + "，最新金价：" + newestPrice + "，变化值：" + priceChange);
-            final Iterator<IGoldMonitor> iterator = monitorMap.values().iterator();
+            final String date = Config.DateFormat.format(new Date(time1));
+            final float priceChange = price1 - price2;
 
-            StringBuilder builderTitle = new StringBuilder(128);
-            StringBuilder builderContent = new StringBuilder(128);
+            System.out.println("最新金价时间：" + date + "，最新金价：" + price1 + "，变化值：" + priceChange + "，间隔秒数：" + (time1 - time2) / 1000);
+
+            final StringBuilder builderTitle = new StringBuilder(128);
+            final StringBuilder builderContent = new StringBuilder(128);
             builderContent.append(date).append(":");
 
             int needNotify = 0;
-            while (iterator.hasNext())
+
+            final Collection<IGoldMonitor> values = monitorMap.values();
+            for (IGoldMonitor monitor : values)
             {
-                final IGoldMonitor monitor =  iterator.next();
                 final String content = monitor.monitor(context);
                 if (content != null) {
 
@@ -111,6 +118,40 @@ public class Run implements Runnable
         }
     }
 
+    /**
+     * 更新价格数组，数组内的元素形如：
+     * {"name":"2019-08-29 00:24:00","value":["2019-08-29 00:24:00","356.73"]}
+     */
+    private void updatePrice()
+    {
+        final JSONArray jsonPriceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
+        final JSONObject jsonPriceNewCache = jsonPriceArray.getJSONObject(0);
+        final JSONObject jsonPriceNew = Util.getNewestPrice();
+
+        final long timeNewInCache = Util.getTime(jsonPriceNewCache);
+        final long timeNew = jsonPriceNew.getLong("time");
+
+        if (timeNew <= timeNewInCache) {
+            return;
+        }
+
+        final JSONObject priceAdd = new JSONObject();
+        final String time = Config.DateFormat.format(new Date(timeNew));
+
+        final JSONArray jsonValueArray = new JSONArray();
+        jsonValueArray.add(time);
+        jsonValueArray.add(jsonPriceNew.getFloat("price"));
+
+        priceAdd.put("name", time);
+        priceAdd.put("value", jsonValueArray);
+
+        jsonPriceArray.add(0, priceAdd);
+
+        if (jsonPriceArray.size() > Config.PriceArrayMaxCacheSize) {
+            jsonPriceArray.remove(jsonPriceArray.size() - 1);
+        }
+    }
+
     public static void main(String[] args)
     {
 
@@ -124,6 +165,6 @@ public class Run implements Runnable
 
         final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         final Run run = new Run();
-        executorService.scheduleAtFixedRate(run, 0, 5, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(run, 0, Config.ThreadTickSecond, TimeUnit.SECONDS);
     }
 }

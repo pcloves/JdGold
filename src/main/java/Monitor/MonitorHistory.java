@@ -29,11 +29,13 @@ public class MonitorHistory implements IGoldMonitor
     @Override
     public String monitor(Context context) {
 
-        final Float priceCurrent = context.get(Context.ContextType.NewestPrice, 0.0f);
-        final Long timeCurrent = context.get(Context.ContextType.NewestTime, System.currentTimeMillis());
-        final JSONArray priceToday = context.get(Context.ContextType.PriceToday, new JSONArray());
+        final JSONArray priceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
+        final JSONObject jsonPriceNew = priceArray.getJSONObject(0);
 
-        final float priceThreshold = priceToday.stream()
+        final Float priceCurrent = Util.getPrice(jsonPriceNew);
+        final Long timeCurrent = Util.getTime(jsonPriceNew);
+
+        final float priceThreshold = priceArray.stream()
                 .filter(s -> timeCurrent - Util.getTime((JSONObject) s) <= this.monitorIntervalMilliSecond)
                 .map(s -> Util.getPrice((JSONObject) s))
                 .reduce((s1, s2) -> upThreshold ? Math.max(s1, s2) : Math.min(s1, s2))

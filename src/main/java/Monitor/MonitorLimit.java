@@ -1,6 +1,8 @@
 package Monitor;
 
 import Context.Context;
+import Utils.Util;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -25,7 +27,10 @@ public class MonitorLimit implements IGoldMonitor
     @Override
     public String monitor(Context context) {
 
-        final Float priceCurrent = context.get(Context.ContextType.NewestPrice, 0.0f);
+        final JSONArray priceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
+        final JSONObject jsonPriceNew = priceArray.getJSONObject(0);
+        final Float priceCurrent = Util.getPrice(jsonPriceNew);
+
         if ((upThreshold && priceCurrent >= priceThreshold) || (!upThreshold && priceCurrent <= priceThreshold)) {
 
             final String s = upThreshold ? "上" : "下";

@@ -38,7 +38,7 @@ public class Util
      *
      * @return 最新价格
      */
-    public static JSONObject getNewestData()
+    public static JSONObject getNewestPrice()
     {
         try {
 

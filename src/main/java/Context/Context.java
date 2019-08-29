@@ -10,9 +10,7 @@ public class Context
 
     public enum ContextType
     {
-        NewestPrice(Float.class),
-        NewestTime(Long.class),
-        PriceToday(JSONArray.class),
+        PriceArray(JSONArray.class),
 
         NotifyTitle(String.class),
         NotifyContent(String.class),

@@ -36,8 +36,10 @@ public class MonitorShake implements IGoldMonitor
     @Override
     public String monitor(Context context)
     {
-        final Float priceCurrent = context.get(Context.ContextType.NewestPrice, 0.0f);
-        final JSONArray priceToday = context.get(Context.ContextType.PriceToday, new JSONArray());
+        final JSONArray priceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
+        final JSONObject jsonPriceNew = priceArray.getJSONObject(0);
+        final Float priceCurrent = Util.getPrice(jsonPriceNew);
+        final JSONArray priceToday = context.get(Context.ContextType.PriceArray, new JSONArray());
         final JSONObject priceJson = Util.getLastSecondData(priceToday, monitorIntervalSecond);
         final Float priceLast = priceJson.getJSONArray("value").getFloat(1);
         final float priceShake = Math.abs(priceCurrent - priceLast);

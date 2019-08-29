@@ -2,41 +2,41 @@
   {
     "name": "MonitorLimit",
     "upThreshold": true,
-    "priceThreshold": 348.5
+    "priceThreshold": 358.5
   },
   {
     "name": "MonitorLimit",
     "upThreshold": false,
-    "priceThreshold": 344.5
+    "priceThreshold": 355.0
   },
   {
     "name": "MonitorHistory",
     "upThreshold": true,
-    "monitorIntervalMinutes": 60
+    "monitorIntervalMinutes": 120
   },
   {
     "name": "MonitorHistory",
     "upThreshold": false,
-    "monitorIntervalMinutes": 60
+    "monitorIntervalMinutes": 130
   },
   {
     "name": "MonitorShake",
-    "priceShakeThreshold": 0.65,
+    "priceShakeThreshold": 0.5,
     "monitorIntervalSecond": 60
   },
   {
     "name": "MonitorShake",
-    "priceShakeThreshold": 1.1,
+    "priceShakeThreshold": 0.8,
     "monitorIntervalSecond": 120
   },
   {
     "name": "MonitorShake",
-    "priceShakeThreshold": 1.5,
+    "priceShakeThreshold": 1.2,
     "monitorIntervalSecond": 180
   },
   {
     "name": "MonitorShake",
-    "priceShakeThreshold": 2.0,
+    "priceShakeThreshold": 1.9,
     "monitorIntervalSecond": 240
   },
   {
