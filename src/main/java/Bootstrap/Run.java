@@ -59,7 +59,9 @@ public class Run implements Runnable
     {
         try
         {
-            updatePrice();
+            if (!updatePrice()) {
+                return;
+            }
 
             final JSONArray priceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
 
@@ -74,7 +76,7 @@ public class Run implements Runnable
             final String date = Config.DateFormat.format(new Date(time1));
             final float priceChange = price1 - price2;
 
-            System.out.println("最新金价时间：" + date + "，最新金价：" + price1 + "，变化值：" + priceChange + "，间隔秒数：" + (time1 - time2) / 1000);
+            System.out.println("最新金价时间：" + date + "，最新金价：" + price1 + "，变化值：" + priceChange + "，间隔秒数：" + (time1 - time2) / 1000.0f);
 
             final StringBuilder builderTitle = new StringBuilder(128);
             final StringBuilder builderContent = new StringBuilder(128);
@@ -122,7 +124,7 @@ public class Run implements Runnable
      * 更新价格数组，数组内的元素形如：
      * {"name":"2019-08-29 00:24:00","value":["2019-08-29 00:24:00","356.73"]}
      */
-    private void updatePrice()
+    private boolean updatePrice()
     {
         final JSONArray jsonPriceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
         final JSONObject jsonPriceNewCache = jsonPriceArray.getJSONObject(0);
@@ -132,7 +134,7 @@ public class Run implements Runnable
         final long timeNew = jsonPriceNew.getLong("time");
 
         if (timeNew <= timeNewInCache) {
-            return;
+            return false;
         }
 
         final JSONObject priceAdd = new JSONObject();
@@ -150,6 +152,8 @@ public class Run implements Runnable
         if (jsonPriceArray.size() > Config.PriceArrayMaxCacheSize) {
             jsonPriceArray.remove(jsonPriceArray.size() - 1);
         }
+
+        return true;
     }
 
     public static void main(String[] args)
