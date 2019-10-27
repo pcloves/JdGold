@@ -49,10 +49,6 @@ public class Run implements Runnable
         fileWatcher.setFile(path.toFile());
         fileWatcher.start();
         fileWatcher.doOnChange();
-
-        //初始化获取当天的价格
-        final JSONArray priceToday = Util.getTodayPrice();
-        context.add(Context.ContextType.PriceArray, priceToday);
     }
 
     public void run()
@@ -127,6 +123,15 @@ public class Run implements Runnable
     private boolean updatePrice()
     {
         final JSONArray jsonPriceArray = context.get(Context.ContextType.PriceArray, new JSONArray());
+        if (jsonPriceArray.isEmpty())
+        {
+            System.out.println("当天价格为空，今天是星期天？");
+            //初始化获取当天的价格
+            final JSONArray priceToday = Util.getTodayPrice();
+            context.add(Context.ContextType.PriceArray, priceToday);
+            return false;
+        }
+
         final JSONObject jsonPriceNewCache = jsonPriceArray.getJSONObject(0);
         final JSONObject jsonPriceNew = Util.getNewestPrice();
 
